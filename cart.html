@@ -1,1 +1,135 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Test Shop | Cart</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
 
+  <!-- GTM -->
+  <script>
+    (function(w,d,s,l,i){
+      w[l]=w[l]||[];
+      w[l].push({'gtm.start': new Date().getTime(),event:'gtm.js'});
+      var f=d.getElementsByTagName(s)[0],
+          j=d.createElement(s),
+          dl=l!='dataLayer'?'&l='+l:'';
+      j.async=true;
+      j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;
+      f.parentNode.insertBefore(j,f);
+    })(window,document,'script','dataLayer','GTM-N2T4MS7M');
+  </script>
+
+  <link rel="stylesheet" href="/assets/styles.css">
+  <script src="/assets/app.js"></script>
+</head>
+
+<body>
+  <noscript>
+    <iframe src="https://www.googletagmanager.com/ns.html?id=GTM-N2T4MS7M"
+            height="0" width="0" style="display:none;visibility:hidden"></iframe>
+  </noscript>
+
+  <header>
+    <div class="actions">
+      <a class="btn ghost" href="/index.html">← Continue shopping</a>
+      <span class="badge" id="modeBadge"></span>
+    </div>
+  </header>
+
+  <h1>Your cart</h1>
+
+  <div id="cartWrap"></div>
+
+  <div class="actions" style="margin-top:12px;">
+    <button class="btn secondary" id="clearBtn">Clear cart</button>
+    <button class="btn" id="checkoutBtn">Begin checkout</button>
+  </div>
+
+  <script>
+    document.getElementById("modeBadge").textContent = "source: " + Shop.getSource();
+
+    function renderCart() {
+      const wrap = document.getElementById("cartWrap");
+      const { cart, value } = Shop.cartTotals();
+
+      if (!cart.length) {
+        wrap.innerHTML = `<div class="notice">Cart is empty.</div>`;
+        document.getElementById("checkoutBtn").disabled = true;
+        return;
+      }
+
+      document.getElementById("checkoutBtn").disabled = false;
+
+      const rows = cart.map(x => `
+        <tr>
+          <td>${x.item_name}</td>
+          <td>${x.item_id}</td>
+          <td>${x.item_variant}</td>
+          <td>${x.quantity}</td>
+          <td>AUD ${Shop.formatMoney(x.price)}</td>
+          <td>AUD ${Shop.formatMoney(x.price * x.quantity)}</td>
+        </tr>
+      `).join("");
+
+      wrap.innerHTML = `
+        <table>
+          <thead>
+            <tr>
+              <th>Name</th><th>Item ID</th><th>Variant</th><th>Qty</th><th>Price</th><th>Total</th>
+            </tr>
+          </thead>
+          <tbody>${rows}</tbody>
+          <tfoot>
+            <tr><td colspan="5">Cart value</td><td>AUD ${Shop.formatMoney(value)}</td></tr>
+          </tfoot>
+        </table>
+      `;
+    }
+
+    renderCart();
+
+    // view_cart once per session (cart page)
+    if (Shop.oncePerSession("view_cart")) {
+      const { cart, value } = Shop.cartTotals();
+      Shop.pushEcomEvent("view_cart", {
+        currency: "AUD",
+        value: value,
+        items: cart.map(x => ({
+          item_id: x.item_id,
+          item_name: x.item_name,
+          item_category: x.item_category,
+          item_variant: x.item_variant,
+          price: x.price,
+          quantity: x.quantity
+        }))
+      });
+    }
+
+    document.getElementById("clearBtn").addEventListener("click", function () {
+      Shop.clearCart();
+      renderCart();
+      alert("Cart cleared.");
+    });
+
+    document.getElementById("checkoutBtn").addEventListener("click", function () {
+      const { cart, value } = Shop.cartTotals();
+      if (!cart.length) return;
+
+      Shop.pushEcomEvent("begin_checkout", {
+        currency: "AUD",
+        value: value,
+        items: cart.map(x => ({
+          item_id: x.item_id,
+          item_name: x.item_name,
+          item_category: x.item_category,
+          item_variant: x.item_variant,
+          price: x.price,
+          quantity: x.quantity
+        }))
+      });
+
+      window.location.href = "/checkout.html";
+    });
+  </script>
+</body>
+</html>
