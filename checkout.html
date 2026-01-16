@@ -19,9 +19,8 @@
     })(window,document,'script','dataLayer','GTM-N2T4MS7M');
   </script>
 
- <link rel="stylesheet" href="assets/styles.css">
-<script src="assets/app.js"></script>
-
+  <link rel="stylesheet" href="assets/styles.css">
+  <script src="assets/app.js"></script>
 </head>
 
 <body>
@@ -32,7 +31,7 @@
 
   <header>
     <div class="actions">
-      <a class="btn ghost" href="/cart.html">← Back to cart</a>
+      <a class="btn ghost" href="cart.html">← Back to cart</a>
       <span class="badge" id="modeBadge"></span>
     </div>
   </header>
@@ -102,24 +101,3 @@
 
     document.getElementById("purchaseBtn").addEventListener("click", function () {
       if (!cart.length) return;
-
-      const transactionId = "T" + Date.now();
-
-      Shop.pushEcomEvent("purchase", {
-        transaction_id: transactionId,
-        currency: "AUD",
-        value: value,
-        tax: 0,
-        shipping: 0,
-        items: itemsForEcom()
-      });
-
-      // Clear cart after purchase
-      Shop.clearCart();
-
-      alert("purchase fired. transaction_id=" + transactionId);
-      window.location.href = "/index.html";
-    });
-  </script>
-</body>
-</html>
