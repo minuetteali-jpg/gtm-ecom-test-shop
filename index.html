@@ -20,9 +20,8 @@
   </script>
   <!-- End Google Tag Manager -->
 
-<link rel="stylesheet" href="assets/styles.css">
-<script src="assets/app.js"></script>
-
+  <link rel="stylesheet" href="assets/styles.css">
+  <script src="assets/app.js"></script>
 </head>
 
 <body>
@@ -39,7 +38,7 @@
     </div>
     <div class="actions">
       <span class="badge" id="modeBadge"></span>
-      <a class="btn ghost" href="/cart.html">Go to cart</a>
+      <a class="btn ghost" href="cart.html">Go to cart</a>
     </div>
   </header>
 
@@ -53,7 +52,6 @@
   <script>
     document.getElementById("modeBadge").textContent = "source: " + Shop.getSource();
 
-    // Render products
     const grid = document.getElementById("productGrid");
     Shop.CATALOG.forEach(p => {
       const el = document.createElement("div");
@@ -63,14 +61,14 @@
         <div class="muted">Item ID: ${p.item_id}</div>
         <div style="margin:10px 0;"><strong>AUD ${Shop.formatMoney(p.price)}</strong></div>
         <div class="actions">
-          <a class="btn ghost" href="/product.html?id=${encodeURIComponent(p.item_id)}">View details</a>
+          <a class="btn ghost" href="product.html?id=${encodeURIComponent(p.item_id)}">View details</a>
           <button class="btn" data-id="${p.item_id}">Add to cart</button>
         </div>
       `;
       grid.appendChild(el);
     });
 
-    // Fire view_item_list once per session
+    // view_item_list once per session
     if (Shop.oncePerSession("view_item_list")) {
       Shop.pushEcomEvent("view_item_list", {
         item_list_id: "tshirts_list",
@@ -92,7 +90,6 @@
       if (!btn) return;
 
       const itemId = btn.getAttribute("data-id");
-      // Simple default variant for listing
       const variant = "M";
       const qty = 1;
 
