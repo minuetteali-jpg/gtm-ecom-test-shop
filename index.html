@@ -1,1 +1,118 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Test Shop | T-Shirts</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
 
+  <!-- Google Tag Manager -->
+  <script>
+    (function(w,d,s,l,i){
+      w[l]=w[l]||[];
+      w[l].push({'gtm.start': new Date().getTime(),event:'gtm.js'});
+      var f=d.getElementsByTagName(s)[0],
+          j=d.createElement(s),
+          dl=l!='dataLayer'?'&l='+l:'';
+      j.async=true;
+      j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;
+      f.parentNode.insertBefore(j,f);
+    })(window,document,'script','dataLayer','GTM-N2T4MS7M');
+  </script>
+  <!-- End Google Tag Manager -->
+
+  <link rel="stylesheet" href="/assets/styles.css">
+  <script src="/assets/app.js"></script>
+</head>
+
+<body>
+  <!-- Google Tag Manager (noscript) -->
+  <noscript>
+    <iframe src="https://www.googletagmanager.com/ns.html?id=GTM-N2T4MS7M"
+            height="0" width="0" style="display:none;visibility:hidden"></iframe>
+  </noscript>
+
+  <header>
+    <div>
+      <h1 style="margin:0;">Test Shop</h1>
+      <div class="muted">Simple T-shirt store for GTM/GA4 ecommerce testing</div>
+    </div>
+    <div class="actions">
+      <span class="badge" id="modeBadge"></span>
+      <a class="btn ghost" href="/cart.html">Go to cart</a>
+    </div>
+  </header>
+
+  <div class="notice">
+    This page fires <strong>view_item_list</strong> once per session.
+    All events include <code>dl_origin=site</code> and <code>source</code> (browser/webview).
+  </div>
+
+  <div class="grid" id="productGrid"></div>
+
+  <script>
+    document.getElementById("modeBadge").textContent = "source: " + Shop.getSource();
+
+    // Render products
+    const grid = document.getElementById("productGrid");
+    Shop.CATALOG.forEach(p => {
+      const el = document.createElement("div");
+      el.className = "card";
+      el.innerHTML = `
+        <h3>${p.item_name}</h3>
+        <div class="muted">Item ID: ${p.item_id}</div>
+        <div style="margin:10px 0;"><strong>AUD ${Shop.formatMoney(p.price)}</strong></div>
+        <div class="actions">
+          <a class="btn ghost" href="/product.html?id=${encodeURIComponent(p.item_id)}">View details</a>
+          <button class="btn" data-id="${p.item_id}">Add to cart</button>
+        </div>
+      `;
+      grid.appendChild(el);
+    });
+
+    // Fire view_item_list once per session
+    if (Shop.oncePerSession("view_item_list")) {
+      Shop.pushEcomEvent("view_item_list", {
+        item_list_id: "tshirts_list",
+        item_list_name: "T-Shirts",
+        items: Shop.CATALOG.map((p, idx) => ({
+          item_id: p.item_id,
+          item_name: p.item_name,
+          item_category: p.item_category,
+          index: idx + 1,
+          price: p.price,
+          quantity: 1
+        }))
+      });
+    }
+
+    // Add-to-cart buttons
+    grid.addEventListener("click", function(e) {
+      const btn = e.target.closest("button[data-id]");
+      if (!btn) return;
+
+      const itemId = btn.getAttribute("data-id");
+      // Simple default variant for listing
+      const variant = "M";
+      const qty = 1;
+
+      const p = Shop.getProduct(itemId);
+      Shop.addToCart(itemId, variant, qty);
+
+      Shop.pushEcomEvent("add_to_cart", {
+        currency: "AUD",
+        value: p.price * qty,
+        items: [{
+          item_id: p.item_id,
+          item_name: p.item_name,
+          item_category: p.item_category,
+          item_variant: variant,
+          price: p.price,
+          quantity: qty
+        }]
+      });
+
+      alert("Added to cart: " + p.item_name);
+    });
+  </script>
+</body>
+</html>
