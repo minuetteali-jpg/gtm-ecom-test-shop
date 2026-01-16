@@ -37,13 +37,11 @@
   </header>
 
   <h1>Checkout (fake)</h1>
-  <div class="notice">Use the buttons to fire shipping/payment events. Then place the order to fire <strong>purchase</strong>.</div>
+  <div class="notice">Click “Place order” to fire <strong>purchase</strong>.</div>
 
   <div class="card">
     <div id="summary"></div>
     <div class="actions" style="margin-top:12px;">
-      <button class="btn ghost" id="shipBtn">Add shipping info</button>
-      <button class="btn ghost" id="payBtn">Add payment info</button>
       <button class="btn" id="purchaseBtn">Place order (purchase)</button>
     </div>
   </div>
@@ -54,15 +52,17 @@
     const { cart, value } = Shop.cartTotals();
 
     const summary = document.getElementById("summary");
+    const purchaseBtn = document.getElementById("purchaseBtn");
+
     if (!cart.length) {
       summary.innerHTML = `<div class="notice">Cart is empty. Go back and add items.</div>`;
-      document.getElementById("purchaseBtn").disabled = true;
-      document.getElementById("shipBtn").disabled = true;
-      document.getElementById("payBtn").disabled = true;
+      purchaseBtn.disabled = true;
     } else {
       summary.innerHTML = `
         <div><strong>Order total:</strong> AUD ${Shop.formatMoney(value)}</div>
-        <div class="muted" style="margin-top:6px;">Items: ${cart.map(x => `${x.item_name} (${x.item_variant}) x${x.quantity}`).join(", ")}</div>
+        <div class="muted" style="margin-top:6px;">
+          Items: ${cart.map(x => `${x.item_name} (${x.item_variant}) x${x.quantity}`).join(", ")}
+        </div>
       `;
     }
 
@@ -77,27 +77,26 @@
       }));
     }
 
-    document.getElementById("shipBtn").addEventListener("click", function () {
+    purchaseBtn.addEventListener("click", function () {
       if (!cart.length) return;
-      Shop.pushEcomEvent("add_shipping_info", {
+
+      const transactionId = "T" + Date.now();
+
+      Shop.pushEcomEvent("purchase", {
+        transaction_id: transactionId,
         currency: "AUD",
         value: value,
-        shipping_tier: "Standard",
+        tax: 0,
+        shipping: 0,
         items: itemsForEcom()
       });
-      alert("add_shipping_info fired");
-    });
 
-    document.getElementById("payBtn").addEventListener("click", function () {
-      if (!cart.length) return;
-      Shop.pushEcomEvent("add_payment_info", {
-        currency: "AUD",
-        value: value,
-        payment_type: "Card",
-        items: itemsForEcom()
-      });
-      alert("add_payment_info fired");
-    });
+      // Clear cart after purchase
+      Shop.clearCart();
 
-    document.getElementById("purchaseBtn").addEventListener("click", function () {
-      if (!cart.length) return;
+      alert("purchase fired. transaction_id=" + transactionId);
+      window.location.href = "index.html";
+    });
+  </script>
+</body>
+</html>
