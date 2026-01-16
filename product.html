@@ -1,1 +1,113 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Test Shop | Product</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
 
+  <!-- GTM -->
+  <script>
+    (function(w,d,s,l,i){
+      w[l]=w[l]||[];
+      w[l].push({'gtm.start': new Date().getTime(),event:'gtm.js'});
+      var f=d.getElementsByTagName(s)[0],
+          j=d.createElement(s),
+          dl=l!='dataLayer'?'&l='+l:'';
+      j.async=true;
+      j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;
+      f.parentNode.insertBefore(j,f);
+    })(window,document,'script','dataLayer','GTM-N2T4MS7M');
+  </script>
+
+  <link rel="stylesheet" href="/assets/styles.css">
+  <script src="/assets/app.js"></script>
+</head>
+
+<body>
+  <noscript>
+    <iframe src="https://www.googletagmanager.com/ns.html?id=GTM-N2T4MS7M"
+            height="0" width="0" style="display:none;visibility:hidden"></iframe>
+  </noscript>
+
+  <header>
+    <div class="actions">
+      <a class="btn ghost" href="/index.html">← Back</a>
+      <a class="btn ghost" href="/cart.html">Cart</a>
+      <span class="badge" id="modeBadge"></span>
+    </div>
+  </header>
+
+  <div class="card" id="productCard"></div>
+
+  <script>
+    document.getElementById("modeBadge").textContent = "source: " + Shop.getSource();
+
+    const params = new URLSearchParams(window.location.search);
+    const itemId = params.get("id") || "TSHIRT_001";
+    const p = Shop.getProduct(itemId);
+
+    const card = document.getElementById("productCard");
+    if (!p) {
+      card.innerHTML = "<h2>Product not found</h2>";
+    } else {
+      card.innerHTML = `
+        <h2 style="margin-top:0;">${p.item_name}</h2>
+        <div class="muted">Item ID: ${p.item_id}</div>
+        <div style="margin:10px 0;"><strong>AUD ${Shop.formatMoney(p.price)}</strong></div>
+
+        <div class="row" style="margin:12px 0;">
+          <label for="sizeSelect" class="muted">Size</label>
+          <select id="sizeSelect">
+            <option value="S">S</option>
+            <option value="M" selected>M</option>
+            <option value="L">L</option>
+          </select>
+        </div>
+
+        <div class="actions">
+          <button class="btn" id="addBtn">Add to cart</button>
+        </div>
+      `;
+
+      // view_item once per session per product
+      const onceKey = "view_item_" + p.item_id;
+      if (Shop.oncePerSession(onceKey)) {
+        Shop.pushEcomEvent("view_item", {
+          currency: "AUD",
+          value: p.price,
+          items: [{
+            item_id: p.item_id,
+            item_name: p.item_name,
+            item_category: p.item_category,
+            item_variant: "M",
+            price: p.price,
+            quantity: 1
+          }]
+        });
+      }
+
+      document.getElementById("addBtn").addEventListener("click", function () {
+        const variant = document.getElementById("sizeSelect").value;
+        const qty = 1;
+
+        Shop.addToCart(p.item_id, variant, qty);
+
+        Shop.pushEcomEvent("add_to_cart", {
+          currency: "AUD",
+          value: p.price * qty,
+          items: [{
+            item_id: p.item_id,
+            item_name: p.item_name,
+            item_category: p.item_category,
+            item_variant: variant,
+            price: p.price,
+            quantity: qty
+          }]
+        });
+
+        alert("Added to cart: " + p.item_name + " (" + variant + ")");
+      });
+    }
+  </script>
+</body>
+</html>
