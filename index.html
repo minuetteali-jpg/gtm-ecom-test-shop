@@ -42,10 +42,7 @@
     </div>
   </header>
 
- // <div class="notice">
-   // This page fires <strong>view_item_list</strong> once per session.
-  //  All events include <code>dl_origin=site</code> and <code>source</code> (browser/webview).
- // </div>
+
 
   <div class="grid" id="productGrid"></div>
 
@@ -68,21 +65,19 @@
       grid.appendChild(el);
     });
 
-    // view_item_list once per session
-    if (Shop.oncePerSession("view_item_list")) {
-      Shop.pushEcomEvent("view_item_list", {
-        item_list_id: "tshirts_list",
-        item_list_name: "T-Shirts",
-        items: Shop.CATALOG.map((p, idx) => ({
-          item_id: p.item_id,
-          item_name: p.item_name,
-          item_category: p.item_category,
-          index: idx + 1,
-          price: p.price,
-          quantity: 1
-        }))
-      });
-    }
+    // view_item_list on every page load
+    Shop.pushEcomEvent("view_item_list", {
+      item_list_id: "tshirts_list",
+      item_list_name: "T-Shirts",
+      items: Shop.CATALOG.map((p, idx) => ({
+        item_id: p.item_id,
+        item_name: p.item_name,
+        item_category: p.item_category,
+        index: idx + 1,
+        price: p.price,
+        quantity: 1
+      }))
+    });
 
     // Add-to-cart buttons
     grid.addEventListener("click", function(e) {
