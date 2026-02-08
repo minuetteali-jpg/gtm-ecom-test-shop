@@ -89,7 +89,7 @@
     renderCart();
 
     // view_cart once per session (cart page)
-    if (Shop.oncePerSession("view_cart")) {
+    if (Shop.pushEcomEvent("view_cart")) {
       const { cart, value } = Shop.cartTotals();
       Shop.pushEcomEvent("view_cart", {
         currency: "AUD",
