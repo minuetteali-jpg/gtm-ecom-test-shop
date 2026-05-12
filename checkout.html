@@ -32,7 +32,6 @@
   <header>
     <div class="actions">
       <a class="btn ghost" href="cart.html">← Back to cart</a>
-      <span class="badge" id="modeBadge"></span>
     </div>
   </header>
 
@@ -45,6 +44,12 @@
       <button class="btn" id="purchaseBtn">Place order (purchase)</button>
     </div>
   </div>
+
+<footer>
+    <div class="container" style="text-align: center; padding: 20px; border-top: 1px solid #eee; margin-top: 20px;">
+        <span class="badge" id="modeBadge"></span>
+    </div>
+</footer>
 
   <script>
     document.getElementById("modeBadge").textContent = "source: " + Shop.getSource();
