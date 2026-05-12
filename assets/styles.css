@@ -1,22 +1,43 @@
 :root { --blue: #0057ff; --border: #e7e7e7; --text: #111; --muted: #666; }
 * { box-sizing: border-box; }
+
 body { font-family: Arial, sans-serif; padding: 20px; color: var(--text); max-width: 960px; margin: 0 auto; }
+
 header { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin-bottom: 16px; }
-a { color: var(--blue); text-decoration: none; }
-a:hover { text-decoration: underline; }
-.badge { font-size: 12px; padding: 4px 8px; border: 1px solid var(--border); border-radius: 999px; color: var(--muted); }
-.grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
-.card { border: 1px solid var(--border); border-radius: 10px; padding: 14px; }
+
+/* --- UPDATED GRID --- */
+.grid { 
+  display: grid; 
+  /* This ensures 3 columns on desktop, but adjusts for mobile */
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); 
+  gap: 16px; 
+}
+
+/* --- UPDATED CARD --- */
+.card { 
+  border: 1px solid var(--border); 
+  border-radius: 10px; 
+  padding: 14px;
+  /* Flexbox makes the card a vertical container */
+  display: flex;
+  flex-direction: column;
+  height: 100%; 
+}
+
 .card h3 { margin: 0 0 8px; }
+
+/* --- UPDATED ACTIONS --- */
+.actions { 
+  display: flex; 
+  gap: 8px; 
+  flex-wrap: wrap; 
+  /* This pushes the buttons to the bottom regardless of text height */
+  margin-top: auto; 
+  padding-top: 12px;
+}
+
+/* --- THE REST OF YOUR EXISTING STYLES --- */
 .muted { color: var(--muted); }
-.row { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
-.btn { display: inline-block; padding: 10px 12px; background: var(--blue); color: #fff; border-radius: 8px; border: none; cursor: pointer; text-align: center; }
-.btn.secondary { background: #111; }
+.btn { display: inline-block; padding: 10px 12px; background: var(--blue); color: #fff; border-radius: 8px; border: none; cursor: pointer; text-align: center; flex: 1; }
 .btn.ghost { background: transparent; color: var(--blue); border: 1px solid var(--border); }
-.btn:disabled { opacity: 0.5; cursor: not-allowed; }
-select, input { padding: 8px; border: 1px solid var(--border); border-radius: 8px; }
-table { width: 100%; border-collapse: collapse; margin-top: 10px; }
-th, td { padding: 10px; border-bottom: 1px solid var(--border); text-align: left; }
-tfoot td { font-weight: bold; }
-.actions { display: flex; gap: 8px; flex-wrap: wrap; }
-.notice { padding: 10px 12px; border: 1px dashed var(--border); border-radius: 10px; margin: 12px 0; }
+/* ... (keep the rest of your file as is) */
