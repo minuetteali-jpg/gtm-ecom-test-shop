@@ -39,17 +39,17 @@
 
   <div id="cartWrap"></div>
 
-<footer>
-    <div class="container" style="text-align: center; padding: 20px; border-top: 1px solid #eee; margin-top: 20px;">
-        <span class="badge" id="modeBadge"></span>
-    </div>
-</footer>
-  
 
   <div class="actions">
     <button class="btn ghost" id="clearBtn">Clear cart</button>
     <button class="btn" id="checkoutBtn">Begin checkout</button>
   </div>
+
+<footer>
+    <div class="container" style="text-align: center; padding: 20px; border-top: 1px solid #eee; margin-top: 20px;">
+        <span class="badge" id="modeBadge"></span>
+    </div>
+</footer>
 
   <script>
   document.getElementById("modeBadge").textContent = "source: " + Shop.getSource();
