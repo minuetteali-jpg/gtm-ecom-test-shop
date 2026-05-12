@@ -1,43 +1,116 @@
-:root { --blue: #0057ff; --border: #e7e7e7; --text: #111; --muted: #666; }
+:root { 
+  --blue: #0057ff; 
+  --border: #e7e7e7; 
+  --text: #111; 
+  --muted: #666; 
+}
+
 * { box-sizing: border-box; }
 
-body { font-family: Arial, sans-serif; padding: 20px; color: var(--text); max-width: 960px; margin: 0 auto; }
+body { 
+  font-family: Arial, sans-serif; 
+  padding: 20px; 
+  color: var(--text); 
+  max-width: 960px; 
+  margin: 0 auto; 
+}
 
-header { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin-bottom: 16px; }
+/* --- HEADER --- */
+header { 
+  display: flex; 
+  justify-content: space-between; 
+  align-items: flex-start; 
+  gap: 12px; 
+  margin-bottom: 24px; 
+}
 
-/* --- UPDATED GRID --- */
+/* --- PRODUCT GRID & CARDS --- */
 .grid { 
   display: grid; 
-  /* This ensures 3 columns on desktop, but adjusts for mobile */
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); 
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); 
   gap: 16px; 
 }
 
-/* --- UPDATED CARD --- */
 .card { 
   border: 1px solid var(--border); 
   border-radius: 10px; 
-  padding: 14px;
-  /* Flexbox makes the card a vertical container */
+  padding: 16px;
   display: flex;
   flex-direction: column;
   height: 100%; 
+  background: #fff;
 }
 
-.card h3 { margin: 0 0 8px; }
+.card h3 { margin: 0 0 8px; font-size: 1.1rem; }
 
-/* --- UPDATED ACTIONS --- */
+/* --- CART TABLE STYLES --- */
+table { 
+  width: 100%; 
+  border-collapse: collapse; 
+  margin: 20px 0; 
+}
+
+th { 
+  text-align: left; 
+  padding: 12px 8px; 
+  border-bottom: 2px solid var(--border); 
+  color: var(--muted);
+  font-size: 0.9rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+td { 
+  padding: 12px 8px; 
+  border-bottom: 1px solid var(--border); 
+  vertical-align: middle;
+}
+
+tfoot td { 
+  font-weight: bold; 
+  font-size: 1.1rem;
+  border-bottom: none;
+  padding-top: 20px;
+}
+
+/* --- BUTTONS & ACTIONS --- */
 .actions { 
   display: flex; 
   gap: 8px; 
   flex-wrap: wrap; 
-  /* This pushes the buttons to the bottom regardless of text height */
-  margin-top: auto; 
-  padding-top: 12px;
+  margin-top: auto; /* Pushes buttons to bottom of cards */
+  padding-top: 16px;
 }
 
-/* --- THE REST OF YOUR EXISTING STYLES --- */
-.muted { color: var(--muted); }
-.btn { display: inline-block; padding: 10px 12px; background: var(--blue); color: #fff; border-radius: 8px; border: none; cursor: pointer; text-align: center; flex: 1; }
-.btn.ghost { background: transparent; color: var(--blue); border: 1px solid var(--border); }
-/* ... (keep the rest of your file as is) */
+.btn { 
+  display: inline-block; 
+  padding: 10px 16px; 
+  background: var(--blue); 
+  color: #fff; 
+  border-radius: 8px; 
+  border: none; 
+  cursor: pointer; 
+  text-align: center; 
+  text-decoration: none;
+  font-weight: 600;
+  flex: 1; /* Makes buttons equal width */
+}
+
+.btn.ghost { 
+  background: transparent; 
+  color: var(--blue); 
+  border: 1px solid var(--border); 
+}
+
+.btn:hover { opacity: 0.9; text-decoration: none; }
+
+/* --- UTILITIES --- */
+.muted { color: var(--muted); font-size: 0.9rem; }
+.badge { 
+  font-size: 12px; 
+  padding: 4px 10px; 
+  border: 1px solid var(--border); 
+  border-radius: 999px; 
+  color: var(--muted); 
+  background: #f9f9f9;
+}
