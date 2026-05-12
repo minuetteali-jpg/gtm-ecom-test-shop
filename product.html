@@ -33,12 +33,18 @@
     <div class="actions">
       <a class="btn ghost" href="index.html">← Back</a>
       <a class="btn ghost" href="cart.html">Cart</a>
-      <span class="badge" id="modeBadge"></span>
     </div>
   </header>
 
   <div class="card" id="productCard"></div>
 
+  <footer>
+    <div class="container" style="text-align: center; padding: 20px; border-top: 1px solid #eee; margin-top: 20px;">
+        <span class="badge" id="modeBadge"></span>
+    </div>
+</footer>
+
+  
   <script>
     document.getElementById("modeBadge").textContent = "source: " + Shop.getSource();
 
