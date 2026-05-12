@@ -37,7 +37,6 @@
       <div class="muted">Simple T-shirt for Testing</div>
     </div>
     <div class="actions">
-      <span class="badge" id="modeBadge"></span>
       <a class="btn ghost" href="cart.html">Go to cart</a>
     </div>
   </header>
@@ -45,6 +44,12 @@
 
 
   <div class="grid" id="productGrid"></div>
+
+  <footer>
+    <div class="container" style="text-align: center; padding: 20px; border-top: 1px solid #eee; margin-top: 20px;">
+        <span class="badge" id="modeBadge"></span>
+    </div>
+</footer>
 
   <script>
     document.getElementById("modeBadge").textContent = "source: " + Shop.getSource();
