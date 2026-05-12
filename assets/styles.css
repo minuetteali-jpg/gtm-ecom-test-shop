@@ -47,32 +47,32 @@ header {
 table { 
   width: 100%; 
   border-collapse: collapse; 
-  margin: 20px 0; 
+  margin: 20px 0;
+  table-layout: fixed; /* Forces columns to respect widths */
 }
 
-th { 
+th, td { 
+  padding: 10px 4px; 
   text-align: left; 
-  padding: 12px 8px; 
-  border-bottom: 2px solid var(--border); 
-  color: var(--muted);
-  font-size: 0.9rem;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
+  border-bottom: 1px solid var(--border);
+  font-size: 13px; /* Smaller font to fit mobile screens */
+  overflow: hidden;
+  word-wrap: break-word;
 }
 
-td { 
-  padding: 12px 8px; 
-  border-bottom: 1px solid var(--border); 
-  vertical-align: middle;
-}
+/* Set specific widths for columns so they align */
+th:nth-child(1), td:nth-child(1) { width: 35%; } /* Name */
+th:nth-child(2), td:nth-child(2) { width: 20%; } /* ID */
+th:nth-child(3), td:nth-child(3) { width: 10%; } /* Var */
+th:nth-child(4), td:nth-child(4) { width: 10%; } /* Qty */
+th:nth-child(5), td:nth-child(5) { width: 25%; text-align: right; } /* Total */
 
+/* Clean up the footer */
 tfoot td { 
   font-weight: bold; 
-  font-size: 1.1rem;
+  padding-top: 15px; 
   border-bottom: none;
-  padding-top: 20px;
 }
-
 /* --- BUTTONS & ACTIONS --- */
 .actions { 
   display: flex; 
