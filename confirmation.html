@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Test Shop | Order confirmed</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <!-- Google Tag Manager -->
+  <script>
+    (function(w,d,s,l,i){
+      w[l]=w[l]||[];
+      w[l].push({'gtm.start': new Date().getTime(),event:'gtm.js'});
+      var f=d.getElementsByTagName(s)[0],
+          j=d.createElement(s),
+          dl=l!='dataLayer'?'&l='+l:'';
+      j.async=true;
+      j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;
+      f.parentNode.insertBefore(j,f);
+    })(window,document,'script','dataLayer','GTM-N2T4MS7M');
+  </script>
+  <!-- End Google Tag Manager -->
+
+  <link rel="stylesheet" href="assets/styles.css?v=2">
+  <script src="assets/app.js?v=2"></script>
+</head>
+
+<body>
+  <!-- Google Tag Manager (noscript) -->
+  <noscript>
+    <iframe src="https://www.googletagmanager.com/ns.html?id=GTM-N2T4MS7M"
+            height="0" width="0" style="display:none;visibility:hidden"></iframe>
+  </noscript>
+
+  <header class="site-header">
+    <div class="wrap">
+      <a class="brand" href="index.html"><span class="brand-mark">TS</span>Test Shop</a>
+      <a class="cart-link" href="cart.html">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 8h12l-1 12H7L6 8z"/><path d="M9 8V6a3 3 0 0 1 6 0v2"/></svg>
+        Cart
+        <span class="cart-count" data-cart-count hidden>0</span>
+      </a>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <div id="confirmation"></div>
+  </main>
+
+  <footer class="site-footer">
+    <div class="wrap">
+      <span class="badge" id="modeBadge" data-source-badge></span>
+    </div>
+  </footer>
+
+  <script>
+    // This page only shows the order. The purchase event has already
+    // fired on the checkout page, so reloading here sends nothing extra.
+    let order = null;
+    try {
+      order = JSON.parse(sessionStorage.getItem("last_order") || "null");
+    } catch (e) {}
+
+    const requested = new URLSearchParams(window.location.search).get("order");
+    if (order && requested && order.transaction_id !== requested) order = null;
+
+    const box = document.getElementById("confirmation");
+
+    if (!order) {
+      box.innerHTML = `
+        <div class="panel empty">
+          <h1>No recent order</h1>
+          <p class="muted">There is no order to show on this device.</p>
+          <a class="btn" href="index.html">Back to the shop</a>
+        </div>`;
+    } else {
+      const lines = order.items.map(x => `
+        <div class="summary-row">
+          <span>${Shop.escapeHtml(x.item_name)} (${Shop.escapeHtml(x.item_variant)}) &times; ${x.quantity}</span>
+          <span>A$${Shop.formatMoney(x.price * x.quantity)}</span>
+        </div>`).join("");
+
+      box.innerHTML = `
+        <div class="panel empty">
+          <div class="tick" aria-hidden="true">&#10003;</div>
+          <h1>Order placed</h1>
+          <p class="muted">Order number <strong>${Shop.escapeHtml(order.transaction_id)}</strong></p>
+        </div>
+        <div class="panel" style="margin-top:20px;">
+          <h2>What you ordered</h2>
+          <div style="margin-top:10px;">${lines}</div>
+          <div class="summary-row total"><span>Order total</span><span>A$${Shop.formatMoney(order.value)}</span></div>
+          <a class="btn block" href="index.html">Continue shopping</a>
+        </div>`;
+    }
+  </script>
+</body>
+</html>

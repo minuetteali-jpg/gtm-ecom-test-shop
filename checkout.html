@@ -5,7 +5,7 @@
   <title>Test Shop | Checkout</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
-  <!-- GTM -->
+  <!-- Google Tag Manager -->
   <script>
     (function(w,d,s,l,i){
       w[l]=w[l]||[];
@@ -18,90 +18,116 @@
       f.parentNode.insertBefore(j,f);
     })(window,document,'script','dataLayer','GTM-N2T4MS7M');
   </script>
+  <!-- End Google Tag Manager -->
 
-  <link rel="stylesheet" href="assets/styles.css">
-  <script src="assets/app.js"></script>
+  <link rel="stylesheet" href="assets/styles.css?v=2">
+  <script src="assets/app.js?v=2"></script>
 </head>
 
 <body>
+  <!-- Google Tag Manager (noscript) -->
   <noscript>
     <iframe src="https://www.googletagmanager.com/ns.html?id=GTM-N2T4MS7M"
             height="0" width="0" style="display:none;visibility:hidden"></iframe>
   </noscript>
 
-  <header>
-    <div class="actions">
-      <a class="btn ghost" href="cart.html">← Back to cart</a>
+  <header class="site-header">
+    <div class="wrap">
+      <a class="brand" href="index.html"><span class="brand-mark">TS</span>Test Shop</a>
+      <a class="cart-link" href="cart.html">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 8h12l-1 12H7L6 8z"/><path d="M9 8V6a3 3 0 0 1 6 0v2"/></svg>
+        Cart
+        <span class="cart-count" data-cart-count hidden>0</span>
+      </a>
     </div>
   </header>
 
-  <h1>Checkout (fake)</h1>
-  <div class="notice">Click “Place order” to fire <strong>purchase</strong>.</div>
+  <main class="wrap">
+    <a class="back-link" href="cart.html">&larr; Back to cart</a>
 
-  <div class="card">
+    <div class="intro">
+      <h1>Checkout</h1>
+      <p>Demo checkout. No payment is taken and nothing is shipped.</p>
+    </div>
+
     <div id="summary"></div>
-    <div class="actions" style="margin-top:12px;">
-      <button class="btn" id="purchaseBtn">Place order (purchase)</button>
-    </div>
-  </div>
+  </main>
 
-<footer>
-    <div class="container" style="text-align: center; padding: 20px; border-top: 1px solid #eee; margin-top: 20px;">
-        <span class="badge" id="modeBadge"></span>
+  <footer class="site-footer">
+    <div class="wrap">
+      <span class="badge" id="modeBadge" data-source-badge></span>
     </div>
-</footer>
+  </footer>
 
   <script>
-    document.getElementById("modeBadge").textContent = "source: " + Shop.getSource();
-
     const { cart, value } = Shop.cartTotals();
-
     const summary = document.getElementById("summary");
-    const purchaseBtn = document.getElementById("purchaseBtn");
 
     if (!cart.length) {
-      summary.innerHTML = `<div class="notice">Cart is empty. Go back and add items.</div>`;
-      purchaseBtn.disabled = true;
-    } else {
       summary.innerHTML = `
-        <div><strong>Order total:</strong> AUD ${Shop.formatMoney(value)}</div>
-        <div class="muted" style="margin-top:6px;">
-          Items: ${cart.map(x => `${x.item_name} (${x.item_variant}) x${x.quantity}`).join(", ")}
-        </div>
-      `;
-    }
+        <div class="panel empty">
+          <h2>Your cart is empty</h2>
+          <p class="muted">Add an item before checking out.</p>
+          <a class="btn" href="index.html">Browse T-shirts</a>
+        </div>`;
+    } else {
+      const lines = cart.map(x => {
+        const p = Shop.getProduct(x.item_id) || {};
+        return `
+          <li class="line">
+            <div class="line-thumb" style="background:${p.tint || "#eee"}">${p.item_id ? Shop.teeSvg(p) : ""}</div>
+            <div>
+              <div class="line-name">${Shop.escapeHtml(x.item_name)}</div>
+              <div class="muted">Size ${Shop.escapeHtml(x.item_variant)} &middot; Qty ${x.quantity}</div>
+            </div>
+            <div class="line-total">A$${Shop.formatMoney(x.price * x.quantity)}</div>
+          </li>`;
+      }).join("");
 
-    function itemsForEcom() {
-      return cart.map(x => ({
-        item_id: x.item_id,
-        item_name: x.item_name,
-        item_category: x.item_category,
-        item_variant: x.item_variant,
-        price: x.price,
-        quantity: x.quantity
-      }));
-    }
+      summary.className = "layout";
+      summary.innerHTML = `
+        <div class="panel"><ul class="lines">${lines}</ul></div>
+        <div class="panel">
+          <h2>Order summary</h2>
+          <div class="summary-row" style="margin-top:10px;"><span>Subtotal</span><span>A$${Shop.formatMoney(value)}</span></div>
+          <div class="summary-row"><span>Shipping</span><span>Free</span></div>
+          <div class="summary-row"><span>Tax</span><span>A$0.00</span></div>
+          <div class="summary-row total"><span>Order total</span><span>A$${Shop.formatMoney(value)}</span></div>
+          <button class="btn block" id="purchaseBtn">Place order</button>
+          <p class="muted" style="margin-top:10px; text-align:center;">Fires the <strong>purchase</strong> event.</p>
+        </div>`;
 
-    purchaseBtn.addEventListener("click", function () {
-      if (!cart.length) return;
+      const purchaseBtn = document.getElementById("purchaseBtn");
 
-      const transactionId = "T" + Date.now();
+      purchaseBtn.addEventListener("click", function () {
+        // Stops a second tap from sending a second purchase
+        purchaseBtn.disabled = true;
 
-      Shop.pushEcomEvent("purchase", {
-        transaction_id: transactionId,
-        currency: "AUD",
-        value: value,
-        tax: 0,
-        shipping: 0,
-        items: itemsForEcom()
+        const transactionId = "T" + Date.now();
+        const items = cart.map(x => Shop.toEcomItem(x));
+
+        // Keep a copy for the confirmation page, then empty the cart
+        try {
+          sessionStorage.setItem("last_order", JSON.stringify({
+            transaction_id: transactionId,
+            value: value,
+            items: items
+          }));
+        } catch (e) {}
+        Shop.clearCart();
+
+        Shop.pushEcomEvent("purchase", {
+          transaction_id: transactionId,
+          currency: "AUD",
+          value: value,
+          tax: 0,
+          shipping: 0,
+          items: items
+        }, function () {
+          Shop.go("confirmation.html?order=" + encodeURIComponent(transactionId));
+        });
       });
-
-      // Clear cart after purchase
-      Shop.clearCart();
-
-      alert("purchase fired. transaction_id=" + transactionId);
-      window.location.href = "index.html";
-    });
+    }
   </script>
 </body>
 </html>

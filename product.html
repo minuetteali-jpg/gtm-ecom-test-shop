@@ -5,7 +5,7 @@
   <title>Test Shop | Product</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
-  <!-- GTM -->
+  <!-- Google Tag Manager -->
   <script>
     (function(w,d,s,l,i){
       w[l]=w[l]||[];
@@ -18,89 +18,104 @@
       f.parentNode.insertBefore(j,f);
     })(window,document,'script','dataLayer','GTM-N2T4MS7M');
   </script>
+  <!-- End Google Tag Manager -->
 
-  <link rel="stylesheet" href="assets/styles.css">
-  <script src="assets/app.js"></script>
+  <link rel="stylesheet" href="assets/styles.css?v=2">
+  <script src="assets/app.js?v=2"></script>
 </head>
 
 <body>
+  <!-- Google Tag Manager (noscript) -->
   <noscript>
     <iframe src="https://www.googletagmanager.com/ns.html?id=GTM-N2T4MS7M"
             height="0" width="0" style="display:none;visibility:hidden"></iframe>
   </noscript>
 
-  <header>
-    <div class="actions">
-      <a class="btn ghost" href="index.html">← Back</a>
-      <a class="btn ghost" href="cart.html">Cart</a>
+  <header class="site-header">
+    <div class="wrap">
+      <a class="brand" href="index.html"><span class="brand-mark">TS</span>Test Shop</a>
+      <a class="cart-link" href="cart.html">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 8h12l-1 12H7L6 8z"/><path d="M9 8V6a3 3 0 0 1 6 0v2"/></svg>
+        Cart
+        <span class="cart-count" data-cart-count hidden>0</span>
+      </a>
     </div>
   </header>
 
-  <div class="card" id="productCard"></div>
+  <main class="wrap">
+    <a class="back-link" href="index.html">&larr; All T-shirts</a>
 
-  <footer>
-    <div class="container" style="text-align: center; padding: 20px; border-top: 1px solid #eee; margin-top: 20px;">
-        <span class="badge" id="modeBadge"></span>
+    <div id="productCard"></div>
+  </main>
+
+  <footer class="site-footer">
+    <div class="wrap">
+      <span class="badge" id="modeBadge" data-source-badge></span>
     </div>
-</footer>
+  </footer>
 
-  
   <script>
-    document.getElementById("modeBadge").textContent = "source: " + Shop.getSource();
-
     const params = new URLSearchParams(window.location.search);
     const itemId = params.get("id") || "TSHIRT_001";
     const p = Shop.getProduct(itemId);
 
     const card = document.getElementById("productCard");
     if (!p) {
-      card.innerHTML = "<h2>Product not found</h2>";
-    } else {
       card.innerHTML = `
-        <h2 style="margin-top:0;">${p.item_name}</h2>
-        <div class="muted">Item ID: ${p.item_id}</div>
-        <div style="margin:10px 0;"><strong>AUD ${Shop.formatMoney(p.price)}</strong></div>
+        <div class="panel empty">
+          <h1>Product not found</h1>
+          <a class="btn" href="index.html">Back to the shop</a>
+        </div>`;
+    } else {
+      document.title = "Test Shop | " + p.item_name;
 
-        <div class="row" style="margin:12px 0;">
-          <label for="sizeSelect" class="muted">Size</label>
-          <select id="sizeSelect">
-            <option value="S">S</option>
-            <option value="M" selected>M</option>
-            <option value="L">L</option>
-          </select>
-        </div>
+      card.className = "product";
+      card.innerHTML = `
+        <div class="product-media" style="background:${p.tint}">${Shop.teeSvg(p)}</div>
+        <div class="product-info">
+          <h1>${Shop.escapeHtml(p.item_name)}</h1>
+          <div class="price">A$${Shop.formatMoney(p.price)}</div>
+          <p>${Shop.escapeHtml(p.description)}</p>
+          <p class="muted">Item ID: ${p.item_id}</p>
 
-        <div class="actions">
-          <button class="btn" id="addBtn">Add to cart</button>
+          <fieldset class="sizes">
+            <legend>Size</legend>
+            ${Shop.SIZES.map(s => `
+              <label>
+                <input type="radio" name="size" value="${s}"${s === Shop.DEFAULT_SIZE ? " checked" : ""}>
+                <span>${s}</span>
+              </label>`).join("")}
+          </fieldset>
+
+          <div class="actions">
+            <button class="btn" id="addBtn">Add to cart</button>
+          </div>
         </div>
       `;
 
-      // view_item once per session per product
-      const onceKey = "view_item_" + p.item_id;
-      if (Shop.oncePerSession(onceKey)) {
-        Shop.pushEcomEvent("view_item", {
-          currency: "AUD",
-          value: p.price,
-          items: [{
-            item_id: p.item_id,
-            item_name: p.item_name,
-            item_category: p.item_category,
-            item_variant: "M",
-            price: p.price,
-            quantity: 1
-          }]
-        });
-      }
+      // view_item on every view of the product page
+      Shop.pushEcomEvent("view_item", {
+        currency: "AUD",
+        value: p.price,
+        items: [{
+          item_id: p.item_id,
+          item_name: p.item_name,
+          item_category: p.item_category,
+          item_variant: Shop.DEFAULT_SIZE,
+          price: p.price,
+          quantity: 1
+        }]
+      });
 
       document.getElementById("addBtn").addEventListener("click", function () {
-        const variant = document.getElementById("sizeSelect").value;
+        const variant = card.querySelector('input[name="size"]:checked').value;
         const qty = 1;
 
         Shop.addToCart(p.item_id, variant, qty);
 
         Shop.pushEcomEvent("add_to_cart", {
           currency: "AUD",
-          value: p.price * qty,
+          value: Shop.round2(p.price * qty),
           items: [{
             item_id: p.item_id,
             item_name: p.item_name,
@@ -111,7 +126,7 @@
           }]
         });
 
-        alert("Added to cart: " + p.item_name + " (" + variant + ")");
+        Shop.toast("Added: " + p.item_name + " (" + variant + ")", "View cart", "cart.html");
       });
     }
   </script>
